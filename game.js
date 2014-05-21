@@ -1,4 +1,4 @@
-var CLIENT_EVENTS = ['init', 'chat', 'select', 'submit', 'start']
+var CLIENT_EVENTS = ['init', 'chat', 'select', 'submit', 'start', 'namechange']
 , models = require('./models');
 
 var Game = function(hash) {
@@ -98,10 +98,12 @@ Game.prototype.getPlayerData = function() {
     var playerData = {};
     for (var i = 0; i < this.players.length; i++) {
 	var player = this.players[i];
+    console.log(this.players[i]);
 	if (null !== player) {
 	    playerData[i] = {
 		score: player.score,
-		online: player.online		
+		online: player.online,		
+        username: player.username
 	    };
 	}
     }
@@ -285,6 +287,16 @@ Game.prototype.submit = function(playerIdx, card) {
     this.fixPlayerHand(playerIdx);
 }
 
+Game.prototype.namechange = function(playerIdx, name) {
+    var player = this.players[playerIdx];
+    //console.log(player);
+    console.log("Player " + playerIdx + " is chaging their name to: " + name);
+    this.broadcast('namechange',{name: name, player_id: playerIdx});
+    player.username = name
+    //this.submitBroadcast();
+
+}
+
 Game.prototype.submitBroadcast = function() {
     if (this.submittedWhites.length === (this.getNumPlayers()-1)) {
 	shuffle(this.submittedWhites);
@@ -362,6 +374,7 @@ function Player(socket, session) {
     this.score = 0;
     this.online = true;
     this.hand = [null, null, null, null, null, null, null, null, null, null];
+    this.username = 'default'
 }
 
 //+ Jonas Raoni Soares Silva

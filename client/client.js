@@ -12,7 +12,7 @@ var socket
 , submittedCards
 , submittedElem = []
 , selected
-, SERVER_EVENTS = ['initPlayer', 'join', 'leave', 'rejoin', 'gameHash', 'remaining', 'admin', 'score', 'newHand', 'round', 'white', 'submitted', 'allsubmitted', 'gameover', 'msg'];
+, SERVER_EVENTS = ['initPlayer', 'join', 'leave', 'rejoin', 'gameHash', 'remaining', 'admin', 'score', 'newHand', 'round', 'white', 'submitted', 'allsubmitted', 'gameover', 'msg', 'namechange'];
 
 function startGame() {
     socket = io.connect();
@@ -129,6 +129,7 @@ function noCardChosen(card) {
 }
 
 function initPlayer(data) {
+    console.log(data);
     gameStarted = data.started;
     if ('myIdx' in data) {
 	myIdx = data.myIdx;
@@ -158,9 +159,20 @@ function initPlayer(data) {
     }
 }
 
+function updateName(name) {
+    var players = {};
+    players[0] = {username: name };
+    socket.emit('namechange', name);
+    updatePlayers(players);
+}
+
 function updatePlayers(players) {
     for (var i in players) {
 	var playerDiv = $('#p' + i);
+    console.log(players[i]);
+    if ('username' in players[i]) { 
+        playerDiv.children('h3').text(''+ players[i].username)
+    }
 	if ('score' in players[i]) {
 	    playerDiv.children('h2').text('' + players[i].score);
 	}
