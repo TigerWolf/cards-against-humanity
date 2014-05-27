@@ -12,7 +12,7 @@ var socket
 , submittedCards
 , submittedElem = []
 , selected
-, SERVER_EVENTS = ['initPlayer', 'join', 'leave', 'rejoin', 'gameHash', 'remaining', 'admin', 'score', 'newHand', 'round', 'white', 'submitted', 'allsubmitted', 'gameover', 'msg', 'namechange'];
+, SERVER_EVENTS = ['initPlayer', 'join', 'leave', 'rejoin', 'gameHash', 'remaining', 'admin', 'score', 'newHand', 'round', 'white', 'submitted', 'allsubmitted', 'gameover', 'msg', 'namechange', 'username'];
 
 function startGame() {
     socket = io.connect();
@@ -31,6 +31,7 @@ function startGame() {
 
     $('#input').focus();
     $('#input').keydown(input);
+    $('#usernamechange').keydown(input_changename);
     $('#share').bind('mouseup', function(event) {
 	$('#share input')[0].select();
 	event.stopImmediatePropagation();
@@ -54,6 +55,22 @@ function initializeGame() {
 	$('#share input').attr('value', window.location.href);
     }
     socket.emit('initialize', msg);
+}
+
+function input_changename(e) {
+    e = e || event;
+    var self = this;
+    if (e.which === 13) {
+    if (!e.ctrlKey) {
+        if (this.value) {
+        updateName(this.value);
+        }
+        this.value = "";
+    } else {
+        this.value += "\n";
+    }
+    e.preventDefault();
+    }
 }
 
 function input(e) {
@@ -161,8 +178,14 @@ function initPlayer(data) {
 
 function updateName(name) {
     var players = {};
-    players[0] = {username: name };
+    players[myIdx] = {username: name };
     socket.emit('namechange', name);
+    updatePlayers(players);
+}
+
+function username(user){
+    var players = {};
+    players[user['playerIdx']] = {username: user['name']};
     updatePlayers(players);
 }
 

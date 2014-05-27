@@ -293,7 +293,8 @@ Game.prototype.namechange = function(playerIdx, name) {
     console.log("Player " + playerIdx + " is chaging their name to: " + name);
     this.broadcast('namechange',{name: name, player_id: playerIdx});
     player.username = name
-    //this.submitBroadcast();
+    // this.broadcast('username', name);
+    this.broadcast('username', {playerIdx: playerIdx, name: name});
 
 }
 
